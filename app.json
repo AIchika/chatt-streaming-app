@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Chatt Streaming App",
-    "slug": "chatt-streaming-app",
+    "name": "Chatt ",
+    "slug": "chatt",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
