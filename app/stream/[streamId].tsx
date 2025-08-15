@@ -223,26 +223,32 @@ export default function StreamScreen() {
               </View>
             )}
             {stream.isCoHost && coHostLayout === 'game' && (
-              <View style={styles.gameLayoutWrap}>
-                <View style={styles.gameTopRow}>
-                  <View style={styles.gameCol} testID="host-info">
-                    <Image source={{ uri: `https://i.pravatar.cc/300?u=${stream.streamer}` }} style={styles.gameColImage} />
-                    <View style={styles.gameColLabelWrap}>
-                      <Text style={styles.gameColLabel}>Host Info</Text>
+              <View style={styles.gameLayoutWrap} testID="game-layout">
+                <View style={styles.gameTopRow} testID="dual-cams">
+                  <View style={styles.gameCol} testID="host-cam">
+                    <Image
+                      source={{ uri: `https://i.pravatar.cc/400?u=${stream.streamer}` }}
+                      style={styles.gameColImage}
+                    />
+                    <View style={styles.nameTagWrap}>
+                      <Text style={styles.nameTagText}>@{stream.streamer}</Text>
                     </View>
                   </View>
-                  <View style={styles.gameCol} testID="cohost-info">
-                    <Image source={{ uri: "https://picsum.photos/300/300?random=42" }} style={styles.gameColImage} />
-                    <View style={styles.gameColLabelWrap}>
-                      <Text style={styles.gameColLabel}>Co-Host Info</Text>
+                  <View style={styles.gameCol} testID="cohost-cam">
+                    <Image
+                      source={{ uri: 'https://i.pravatar.cc/400?u=cohost_' + (stream.streamer ?? 'guest') }}
+                      style={styles.gameColImage}
+                    />
+                    <View style={styles.nameTagWrap}>
+                      <Text style={styles.nameTagText}>@{(stream as any).coHost ?? 'guest42'}</Text>
                     </View>
                   </View>
                 </View>
-                <View style={styles.gameMain} testID="host-game-stream">
-                  <Image source={{ uri: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop' }} style={styles.gameMainImage} />
-                  <View style={styles.gameMainLabelWrap}>
-                    <Text style={styles.gameMainLabel}>Host’s Game Stream</Text>
-                  </View>
+                <View style={styles.gameMain} testID="game-capture">
+                  <Image
+                    source={{ uri: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1600&auto=format&fit=crop' }}
+                    style={styles.gameMainImage}
+                  />
                 </View>
               </View>
             )}
@@ -443,15 +449,13 @@ const styles = StyleSheet.create({
   coHostImage: { width: "100%", height: "100%" },
   coHostLabel: { position: "absolute", bottom: 4, left: 4, backgroundColor: "#FF8A00", paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, fontSize: 10, color: "#0b0b0d", fontWeight: "800" },
   gameLayoutWrap: { position: 'absolute', left: 12, right: 12, top: 70, bottom: 12 },
-  gameTopRow: { height: 170, flexDirection: 'row' },
-  gameCol: { flex: 1, backgroundColor: '#0f0f12', borderWidth: 1, borderColor: 'rgba(255,138,0,0.4)', overflow: 'hidden' },
-  gameColImage: { width: '100%', height: '100%' },
-  gameColLabelWrap: { position: 'absolute', left: 8, bottom: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
-  gameColLabel: { color: '#fff', fontSize: 12, fontWeight: '800' },
-  gameMain: { flex: 1, marginTop: 12, backgroundColor: '#0f0f12', borderWidth: 1, borderColor: 'rgba(255,138,0,0.4)', borderRadius: 12, overflow: 'hidden' },
-  gameMainImage: { width: '100%', height: '100%' },
-  gameMainLabelWrap: { position: 'absolute', left: 12, top: 12, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
-  gameMainLabel: { color: '#fff', fontSize: 13, fontWeight: '800' },
+  gameTopRow: { flex: 0.35, flexDirection: 'row' },
+  gameCol: { flex: 1, backgroundColor: '#000', overflow: 'hidden' },
+  gameColImage: { width: '100%', height: '100%', resizeMode: 'cover' },
+  nameTagWrap: { position: 'absolute', left: 8, bottom: 8, backgroundColor: 'rgba(0,0,0,0.55)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  nameTagText: { color: '#fff', fontSize: 12, fontWeight: '800' },
+  gameMain: { flex: 0.65, marginTop: 8, backgroundColor: '#000', overflow: 'hidden' },
+  gameMainImage: { width: '100%', height: '100%', resizeMode: 'cover' },
   chatContainer: { flex: 1, backgroundColor: "#121212", borderTopLeftRadius: 24, borderTopRightRadius: 24, marginTop: -24, paddingTop: 16 },
   chatHeader: { flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: "rgba(255, 255, 255, 0.1)" },
   subscribeBtn: { marginLeft: "auto", backgroundColor: "#FF8A00", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16 },
