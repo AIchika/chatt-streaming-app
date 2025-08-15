@@ -135,25 +135,27 @@ export default function HomeScreen() {
 
         {!isFullscreen && (
           <View style={styles.feedProfileRow}>
-            <Image source={{ uri: avatarUrl(item.streamer) }} style={styles.feedAvatar} />
+            <View style={styles.avatarWrap}>
+              <Image source={{ uri: avatarUrl(item.streamer) }} style={styles.feedAvatar} />
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={() => {
+                  setFollowedIds((prev) => prev.includes(String(item.id)) ? prev.filter((id) => id !== String(item.id)) : [...prev, String(item.id)]);
+                }}
+                style={[styles.avatarBadge, followedIds.includes(String(item.id)) ? styles.avatarBadgeFollowed : undefined]}
+                testID={`feed-follow-${item.id}`}
+              >
+                {followedIds.includes(String(item.id)) ? (
+                  <Check size={14} color="#fff" />
+                ) : (
+                  <Plus size={14} color="#0b0b0d" />
+                )}
+              </TouchableOpacity>
+            </View>
             <View style={styles.feedTextWrap}>
               <Text numberOfLines={1} style={styles.feedTitle}>{item.title}</Text>
               <Text numberOfLines={1} style={styles.feedMeta}>@{item.streamer} • {item.category}</Text>
             </View>
-            <TouchableOpacity
-              accessibilityRole="button"
-              style={[styles.followBtn, followedIds.includes(String(item.id)) ? styles.followBtnActive : undefined]}
-              onPress={() => {
-                setFollowedIds((prev) => prev.includes(String(item.id)) ? prev.filter((id) => id !== String(item.id)) : [...prev, String(item.id)]);
-              }}
-              testID={`feed-follow-${item.id}`}
-            >
-              {followedIds.includes(String(item.id)) ? (
-                <Check size={16} color="#0b0b0d" />
-              ) : (
-                <Plus size={16} color="#0b0b0d" />
-              )}
-            </TouchableOpacity>
           </View>
         )}
 
@@ -423,7 +425,10 @@ const styles = StyleSheet.create({
   feedViewersPill: { backgroundColor: "#FF8A00", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, flexDirection: "row", alignItems: "center", gap: 6 },
   feedViewersText: { color: "#0b0b0d", fontSize: 12, fontWeight: "900" },
   feedProfileRow: { position: "absolute", left: 12, right: 80, bottom: 100, flexDirection: "row", alignItems: "center", gap: 10 },
+  avatarWrap: { position: 'relative', width: 40, height: 40 },
   feedAvatar: { width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: "#FF8A00" },
+  avatarBadge: { position: 'absolute', right: -2, bottom: -2, width: 18, height: 18, borderRadius: 9, backgroundColor: '#FF8A00', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#0b0b0d' },
+  avatarBadgeFollowed: { backgroundColor: '#22c55e' },
   feedTextWrap: { flex: 1 },
   feedTitle: { color: "#fff", fontSize: 18, fontWeight: "800" },
   feedMeta: { color: "#c9ced6", fontSize: 13, marginTop: 2 },
