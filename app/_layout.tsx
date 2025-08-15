@@ -8,6 +8,7 @@ import { StreamProvider } from "@/providers/StreamProvider";
 import { ChatProvider } from "@/providers/ChatProvider";
 import { SettingsProvider } from "@/providers/SettingsProvider";
 import AppErrorBoundary from "@/components/ErrorBoundary";
+import { trpc, trpcClient } from "@/lib/trpc";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -41,20 +42,22 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <SettingsProvider>
-          <AuthProvider>
-            <StreamProvider>
-              <ChatProvider>
-                <AppErrorBoundary>
-                  <RootLayoutNav />
-                </AppErrorBoundary>
-              </ChatProvider>
-            </StreamProvider>
-          </AuthProvider>
-        </SettingsProvider>
-      </GestureHandlerRootView>
-    </QueryClientProvider>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <SettingsProvider>
+            <AuthProvider>
+              <StreamProvider>
+                <ChatProvider>
+                  <AppErrorBoundary>
+                    <RootLayoutNav />
+                  </AppErrorBoundary>
+                </ChatProvider>
+              </StreamProvider>
+            </AuthProvider>
+          </SettingsProvider>
+        </GestureHandlerRootView>
+      </QueryClientProvider>
+    </trpc.Provider>
   );
 }
