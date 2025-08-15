@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, FlatList, useWindowDimensions, Platform, Share } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { Users, Share2, VolumeX, MoreVertical, Maximize2 } from "lucide-react-native";
+import { Users, Share2, VolumeX, MoreVertical, Maximize2, Plus, Check } from "lucide-react-native";
 import { router } from "expo-router";
 import { useStreams } from "@/providers/StreamProvider";
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -20,6 +20,7 @@ export default function HomeScreen() {
   const [idleOverlayIndex, setIdleOverlayIndex] = useState<number | null>(null);
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mutedIds, setMutedIds] = useState<string[]>([]);
+  const [followedIds, setFollowedIds] = useState<string[]>([]);
   const [fullscreenIndex, setFullscreenIndex] = useState<number | null>(null);
 
   const categories: string[] = useMemo(() => ["All", "Just chatting", "IRL", "Gaming", "Action"], []);
@@ -139,6 +140,20 @@ export default function HomeScreen() {
               <Text numberOfLines={1} style={styles.feedTitle}>{item.title}</Text>
               <Text numberOfLines={1} style={styles.feedMeta}>@{item.streamer} • {item.category}</Text>
             </View>
+            <TouchableOpacity
+              accessibilityRole="button"
+              style={[styles.followBtn, followedIds.includes(String(item.id)) ? styles.followBtnActive : undefined]}
+              onPress={() => {
+                setFollowedIds((prev) => prev.includes(String(item.id)) ? prev.filter((id) => id !== String(item.id)) : [...prev, String(item.id)]);
+              }}
+              testID={`feed-follow-${item.id}`}
+            >
+              {followedIds.includes(String(item.id)) ? (
+                <Check size={16} color="#0b0b0d" />
+              ) : (
+                <Plus size={16} color="#0b0b0d" />
+              )}
+            </TouchableOpacity>
           </View>
         )}
 
@@ -417,5 +432,7 @@ const styles = StyleSheet.create({
   categoriesBar: { position: "absolute", top: 6, left: 0, right: 0 },
 
   feedActionsColumn: { position: 'absolute', right: 12, bottom: 100, alignItems: 'center', gap: 10 },
-  feedActionBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', alignItems: 'center' }
+  feedActionBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', alignItems: 'center' },
+  followBtn: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#FF8A00', justifyContent: 'center', alignItems: 'center', marginLeft: 8 },
+  followBtnActive: { backgroundColor: '#22c55e' }
 });
