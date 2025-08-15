@@ -56,7 +56,7 @@ export default function StreamScreen() {
   const [fireworks, setFireworks] = useState<boolean>(false);
   const [lastCelebrationPrice, setLastCelebrationPrice] = useState<number | null>(null);
   const [lastGifterName, setLastGifterName] = useState<string>("You");
-  const [coHostLayout, setCoHostLayout] = useState<'pip' | 'vertical' | 'horizontal' | 'game'>('pip');
+  const [coHostLayout, setCoHostLayout] = useState<'pip' | 'vertical' | 'horizontal' | 'game'>(String(streamId ?? '') === 'demo-cohost-game' ? 'game' : 'pip');
   const flatListRef = useRef<FlatList<ChatItem> | null>(null);
 
   const defaultStickers: string[] = [

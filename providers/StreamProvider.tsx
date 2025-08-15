@@ -41,6 +41,17 @@ export const [StreamProvider, useStreams] = createContextHook(() => {
   };
 
   const base: Stream[] = [
+    {
+      id: 'demo-cohost-game',
+      title: 'Duos Ranked Grind — Co-Host Live',
+      streamer: 'ProHost',
+      category: 'Gaming',
+      viewers: '12.4K',
+      thumbnail: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop',
+      isLive: true,
+      isCoHost: true,
+      description: 'Squad up! Co-hosting a competitive match. Tap to see split host/co-host and big game view.',
+    },
     ...gen('Gaming', 10, 'game'),
     ...gen('Just chatting', 10, 'chat'),
     ...gen('IRL', 10, 'irl'),
