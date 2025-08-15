@@ -169,7 +169,7 @@ export default function HomeScreen() {
         )}
       </View>
     );
-  }, [height, width, idleOverlayIndex, mutedIds]);
+  }, [height, width, idleOverlayIndex, mutedIds, followedIds, fullscreenIndex]);
 
   const keyExtractor = useCallback((it: any) => String(it.id), []);
 
@@ -212,6 +212,7 @@ export default function HomeScreen() {
             data={filtered}
             keyExtractor={keyExtractor}
             renderItem={renderFeedItem}
+            extraData={{ mutedIds, followedIds, fullscreenIndex, selectedCategory }}
             pagingEnabled
             snapToInterval={height}
             decelerationRate={Platform.OS === "ios" ? "fast" : 0.98}
@@ -272,6 +273,7 @@ export default function HomeScreen() {
           data={filtered}
           keyExtractor={keyExtractor}
           renderItem={renderFeedItem}
+          extraData={{ mutedIds, followedIds, fullscreenIndex, selectedCategory }}
           pagingEnabled
           snapToInterval={height}
           decelerationRate={Platform.OS === "ios" ? "fast" : 0.98}
