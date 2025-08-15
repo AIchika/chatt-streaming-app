@@ -56,7 +56,10 @@ export default function HomeScreen() {
         <LinearGradient colors={["rgba(0,0,0,0.2)", "rgba(0,0,0,0.7)"]} style={styles.feedGradient} />
 
         <View style={styles.centerBoxWrap} pointerEvents="box-none">
-          <View style={[styles.streamBox, { width: boxWidth, height: boxHeight, position: 'absolute', top: desiredTop, borderRadius: isFullscreen ? 0 : 28 }]}
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => router.push(`/stream/${item.id}`)}
+            style={[styles.streamBox, { width: boxWidth, height: boxHeight, position: 'absolute', top: desiredTop, borderRadius: isFullscreen ? 0 : 28 }]}
             testID={`stream-box-${item.id}`}
           >
             <Image source={{ uri: item.thumbnail }} style={styles.streamBoxImage} />
@@ -69,7 +72,7 @@ export default function HomeScreen() {
                 <Text style={styles.feedViewersText}>{item.viewers}</Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {!isFullscreen && (
@@ -125,13 +128,6 @@ export default function HomeScreen() {
           </View>
         )}
 
-        <TouchableOpacity
-          activeOpacity={0.95}
-          onPress={() => router.push(`/stream/${item.id}`)}
-          style={StyleSheet.absoluteFill}
-        >
-          <View />
-        </TouchableOpacity>
 
         {!isFullscreen && (
           <View style={styles.feedProfileRow}>
@@ -139,6 +135,7 @@ export default function HomeScreen() {
               <Image source={{ uri: avatarUrl(item.streamer) }} style={styles.feedAvatar} />
               <TouchableOpacity
                 accessibilityRole="button"
+                accessibilityState={{ selected: followedIds.includes(String(item.id)) }}
                 onPress={() => {
                   setFollowedIds((prev) => prev.includes(String(item.id)) ? prev.filter((id) => id !== String(item.id)) : [...prev, String(item.id)]);
                 }}
@@ -428,7 +425,7 @@ const styles = StyleSheet.create({
   avatarWrap: { position: 'relative', width: 40, height: 40 },
   feedAvatar: { width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: "#FF8A00" },
   avatarBadge: { position: 'absolute', right: -2, bottom: -2, width: 18, height: 18, borderRadius: 9, backgroundColor: '#FF8A00', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#0b0b0d' },
-  avatarBadgeFollowed: { backgroundColor: '#22c55e' },
+  avatarBadgeFollowed: { backgroundColor: '#22c55e', borderColor: '#0b0b0d' },
   feedTextWrap: { flex: 1 },
   feedTitle: { color: "#fff", fontSize: 18, fontWeight: "800" },
   feedMeta: { color: "#c9ced6", fontSize: 13, marginTop: 2 },
