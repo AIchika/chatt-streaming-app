@@ -26,6 +26,7 @@ import {
   MoreVertical,
   VolumeX,
   UserCheck,
+  UserPlus,
 } from "lucide-react-native";
 import { useChat } from "@/providers/ChatProvider";
 import { useStreams } from "@/providers/StreamProvider";
@@ -38,6 +39,10 @@ interface ChatItem {
 }
 
 type GiftOption = { id: string; label: string; price: number };
+
+type Friend = { id: string; username: string; avatar: string; online: boolean };
+
+type InviteState = "idle" | "sending" | "sent" | "accepted" | "error";
 
 export default function StreamScreen() {
   const { streamId } = useLocalSearchParams();
@@ -57,6 +62,8 @@ export default function StreamScreen() {
   const [lastCelebrationPrice, setLastCelebrationPrice] = useState<number | null>(null);
   const [lastGifterName, setLastGifterName] = useState<string>("You");
   const [coHostLayout, setCoHostLayout] = useState<'pip' | 'vertical' | 'horizontal' | 'game'>(String(streamId ?? '') === 'demo-cohost-game' ? 'game' : 'pip');
+  const [showCoHostInvite, setShowCoHostInvite] = useState<boolean>(false);
+  const [inviteStatus, setInviteStatus] = useState<Record<string, InviteState>>({});
   const flatListRef = useRef<FlatList<ChatItem> | null>(null);
 
   const defaultStickers: string[] = [
@@ -65,6 +72,16 @@ export default function StreamScreen() {
     "https://i.imgur.com/6XKx3.gif",
     "https://i.imgur.com/kq5z3eN.png",
   ];
+
+  const friends = useMemo<Friend[]>(
+    () => [
+      { id: 'f1', username: 'alex', avatar: 'https://i.pravatar.cc/150?u=alex', online: true },
+      { id: 'f2', username: 'bella', avatar: 'https://i.pravatar.cc/150?u=bella', online: true },
+      { id: 'f3', username: 'cody', avatar: 'https://i.pravatar.cc/150?u=cody', online: false },
+      { id: 'f4', username: 'dina', avatar: 'https://i.pravatar.cc/150?u=dina', online: true },
+    ],
+    []
+  );
 
   const stream = getStreamById(String(streamId ?? ""));
 
@@ -150,8 +167,6 @@ export default function StreamScreen() {
               </View>
             </View>
 
-            {/* Right column removed to keep controls horizontal near description */}
-
             <View style={styles.streamInfoOverlay}>
               <View style={styles.streamerInfo}>
                 <Image
@@ -176,6 +191,9 @@ export default function StreamScreen() {
                   <View style={styles.actionsRowCompact}>
                     <TouchableOpacity style={styles.actionButtonTinyGhost} onPress={() => setMuted((m) => !m)} testID="mute-button">
                       <VolumeX size={18} color={muted ? chat.primaryColor : "#fff"} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButtonTinyGhost} onPress={() => setShowCoHostInvite(true)} testID="cohost-button">
+                      <UserPlus size={18} color="#fff" />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButtonTinyGhost} onPress={() => console.log("share")} testID="share-button">
                       <Share2 size={18} color="#fff" />
@@ -407,6 +425,42 @@ export default function StreamScreen() {
             </View>
           </Modal>
 
+          <Modal transparent visible={showCoHostInvite} animationType="slide" onRequestClose={() => setShowCoHostInvite(false)}>
+            <View style={styles.bottomSheet}>
+              <Text style={styles.sheetTitle}>Invite a Co-Host</Text>
+              <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ paddingBottom: 8 }}>
+                {friends.map((f) => {
+                  const state: InviteState = inviteStatus[f.id] ?? 'idle';
+                  const isOnline = f.online;
+                  const disabled = !isOnline || state === 'sending' || state === 'sent' || state === 'accepted';
+                  return (
+                    <View key={f.id} style={styles.friendRow}>
+                      <Image source={{ uri: f.avatar }} style={styles.friendAvatar} />
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.friendName}>@{f.username}</Text>
+                        <Text style={[styles.friendStatus, { color: isOnline ? '#4ade80' : '#9ca3af' }]}>{isOnline ? 'Online' : 'Offline'}</Text>
+                      </View>
+                      <TouchableOpacity
+                        disabled={disabled}
+                        onPress={() => {
+                          console.log('Invite co-host ->', f.username);
+                          setInviteStatus((prev) => ({ ...prev, [f.id]: 'sending' }));
+                          setTimeout(() => {
+                            setInviteStatus((prev) => ({ ...prev, [f.id]: 'sent' }));
+                          }, 900);
+                        }}
+                        style={[styles.inviteBtn, disabled ? styles.inviteBtnDisabled : { backgroundColor: chat.primaryColor }]}
+                        testID={`invite-${f.id}`}
+                      >
+                        <Text style={styles.inviteBtnText}>{state === 'sent' || state === 'accepted' ? 'Invited' : state === 'sending' ? 'Sending…' : 'Invite'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          </Modal>
+
           {fireworks && (
             <View style={styles.fireworksOverlay} pointerEvents="none">
               <Text style={[styles.fireworksText, { color: chat.giftPopupColor }]}>🎆 {lastGifterName}: <Text style={{ color: (lastCelebrationPrice ?? 0) >= 10 ? chat.giftPhraseHighColor : (lastCelebrationPrice ?? 0) >= 5 ? chat.giftPhraseMidColor : chat.giftPhraseLowColor, fontWeight: '800' }}>{giftPhraseFor(lastCelebrationPrice ?? 5)}</Text> 🎆</Text>
@@ -489,4 +543,11 @@ const styles = StyleSheet.create({
   subscribePlanPrice: { color: "#0b0b0d", fontSize: 14, fontWeight: "800" },
   fireworksOverlay: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, alignItems: "center", justifyContent: "center" },
   fireworksText: { fontSize: 22, color: "#fff", backgroundColor: "rgba(0,0,0,0.5)", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12 },
+  friendRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 4 },
+  friendAvatar: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
+  friendName: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  friendStatus: { color: '#9ca3af', fontSize: 12, marginTop: 2 },
+  inviteBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, backgroundColor: '#FF8A00' },
+  inviteBtnDisabled: { backgroundColor: 'rgba(255,255,255,0.15)' },
+  inviteBtnText: { color: '#0b0b0d', fontSize: 12, fontWeight: '800' },
 });
